@@ -35,9 +35,8 @@ function analysis() {
   let counts = {};
   let last_appearance = {};
   let questions = {};
-  let min_time = Infinity;
-  let min_question = -1;
-  let min_occurences = {};
+  let min_occurences = {}; // minimum time to reoccur for each question
+  let recur_times = [];
   let diff_counts = {
     "Easy": {
         "count": 0,
@@ -68,6 +67,7 @@ function analysis() {
       if (!(id in min_occurences) || date - last_appearance[id] < min_occurences[id][0]) {
         min_occurences[id] = [date - last_appearance[id], last_appearance[id], date];
       }
+      recur_times.push(date - last_appearance[id]);
     }
     counts[id] = (id in counts) ? counts[id] + 1 : 1;
     last_appearance[id] = date;
@@ -82,6 +82,7 @@ function analysis() {
   console.log("\nGeneral Stats\n=======");
   console.log(`Total dailies: ${rows.length}`);
   console.log(`Unique questions: ${Object.keys(questions).length}`);
+  console.log(`Avg. Recur Time: ${round(recur_times.reduce((partialSum, a) => partialSum + a, 0) / (recur_times.length * 60 * 60 * 1000 * 24))} Days`);
 
   console.log("\nDifficulty Count\n=======");
   for (let diff of Object.keys(diff_counts)) {
@@ -103,6 +104,9 @@ function analysis() {
     console.log(questions[q[0]]);
     console.log(`${q[1][0] / (1000 * 60 * 60 * 24)} days : ${new Date(q[1][1]).toUTCString().slice(0, 16)} - ${new Date(q[1][2]).toUTCString().slice(0, 16)}\n`);
   }
+
+  // save recur times for histogram
+  //fs.writeFileSync("recur.csv", recur_times.map((x) => x / (60 * 60 * 1000 * 24)).join(","), 'utf8');
 }
 
 function set_headers(row) {
