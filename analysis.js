@@ -82,7 +82,9 @@ function analysis() {
   console.log("\nGeneral Stats\n=======");
   console.log(`Total dailies: ${rows.length}`);
   console.log(`Unique questions: ${Object.keys(questions).length}`);
+  console.log(`Number of questions that reoccurred: ${Object.keys(min_occurences).length}`);
   console.log(`Avg. Recur Time: ${round(recur_times.reduce((partialSum, a) => partialSum + a, 0) / (recur_times.length * 60 * 60 * 1000 * 24))} Days`);
+
 
   console.log("\nDifficulty Count\n=======");
   for (let diff of Object.keys(diff_counts)) {
