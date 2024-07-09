@@ -21,3 +21,9 @@ Some charts I made with the results of the analysis.
 
 ### Comparing daily and overall distribution
 ![daily and overall comparison](https://github.com/ericanderson2/leetcode-daily-analysis/blob/main/visualizations/question_distribution.png)
+
+### Time between question appearances
+
+Average time between reoccurrences: 531 days.
+
+![time to reoccur](https://github.com/ericanderson2/leetcode-daily-analysis/blob/main/visualizations/Time%20for%20question%20to%20reoccur.png)
