@@ -4,7 +4,7 @@ LeetCode has a 'daily' question that changes at 0:00 UTC every day. This code fe
 
 ## Running
 
-`get_records.js` fetches the information about the daily and weekly questions from the LeetCode API, and writes them to CSV files. Those files have already been generated and are included in this repository (up-to-date as of 2024-07-09). For the most updated data, use `node get_records.js` in your console. This will take a couple of minutes-- to prevent rate limiting, the code waits for 3 seconds after pulling the data for each month.
+`get_records.js` fetches the information about the daily and weekly questions from the LeetCode API, and writes them to CSV files. Those files have already been generated and are included in this repository (up-to-date as of 2024-07-09). For the most updated data, use `node get_records.js` in your console. Also, make sure to update the `end_year` (current year) and `end_month` (current month, 1-12) values, which are hardcoded in the file. This will take a minute or two -- to prevent rate limiting, the code waits for 2 seconds after pulling the data for each month.
 
 To run the analysis, use `node analysis.js` in the console. This code will read a CSV file and output summary statistics in the console. It only summarizes statistics for `daily.csv`, but you can modify the code to show the weekly statistics.
 
