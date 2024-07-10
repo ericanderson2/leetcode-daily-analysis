@@ -1,16 +1,18 @@
 const fs = require("fs");
 
-let headings = ["date", "titleSlug", "questionFrontendId", "title", "difficulty"];
+const end_year = 2024;
+const end_month = 7;
 
+let headings = ["date", "titleSlug", "questionFrontendId", "title", "difficulty", "acRate"];
 (async () => {
   let daily = [];
   let weekly = [];
   daily.push(headings);
   weekly.push(headings);
   // first daily: 2020-04 (first weekly: 2020-08)
-  for (let year = 2020; year <= 2024; year++) {
+  for (let year = 2020; year <= end_year; year++) {
     for (let month = 1; month <= 12; month++) {
-      if ((year == 2020 && month < 4) || (year == 2024 && month > 7)) {
+      if ((year == 2020 && month < 4) || (year == end_year && month > end_month)) {
         continue;
       }
 
@@ -20,7 +22,7 @@ let headings = ["date", "titleSlug", "questionFrontendId", "title", "difficulty"
       append_to_arr(res["challenges"], daily);
       append_to_arr(res["weeklyChallenges"], weekly);
 
-      await sleep(3000); // to prevent rate limiting
+      await sleep(2000); // to prevent rate limiting
     }
   }
 
@@ -34,6 +36,7 @@ function append_to_arr(input, arr) {
   for (let day of input) {
     let q = day["question"];
     q["date"] = day["date"];
+    q["acRate"] = JSON.parse(q["stats"])["acRate"].replace("%", "");
     let row = [];
     for (let h of headings) {
       row.push(q[h]);
@@ -63,6 +66,7 @@ async function get_records(year, month) {
         title
         titleSlug
         difficulty
+        stats
       }
     }
     weeklyChallenges {
@@ -72,6 +76,7 @@ async function get_records(year, month) {
         title
         titleSlug
         difficulty
+        stats
       }
     }
   }

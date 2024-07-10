@@ -28,29 +28,24 @@ const round = (num) => {
 }
 
 function analysis() {
-  // headers: date, titleSlug, questionFrontendId, title, difficulty
+  // headers: date, titleSlug, questionFrontendId, title, difficulty, acRate
   let rows = global.rows;
   let i = global.index;
 
   let counts = {};
+  let rates = [["date", "acRate"]];
   let last_appearance = {};
   let questions = {};
   let min_occurences = {}; // minimum time to reoccur for each question
   let recur_times = [];
-  let diff_counts = {
-    "Easy": {
-        "count": 0,
-        "day": [0, 0, 0, 0, 0, 0, 0]
-    },
-    "Medium": {
-        "count": 0,
-        "day": [0, 0, 0, 0, 0, 0, 0]
-    },
-    "Hard": {
+  let diff_counts = {}
+  for (let diff of ["Easy", "Medium", "Hard"]) {
+    diff_counts[diff] = {
         "count": 0,
         "day": [0, 0, 0, 0, 0, 0, 0]
     }
   }
+
   for (let row of rows) {
     let d = row[i["date"]].split('-');
     let date = Date.UTC(d[0], d[1] - 1, d[2]);
@@ -58,6 +53,9 @@ function analysis() {
     let id = row[i["questionFrontendId"]];
     let title = row[i["title"]];
     let difficulty = row[i["difficulty"]];
+    let acRate = row[i["acRate"]];
+
+    rates.push([new Date(date).getUTCDate(), acRate]);
 
     diff_counts[difficulty]["count"] += 1;
     diff_counts[difficulty]["day"][new Date(date).getUTCDay()] += 1;
@@ -85,7 +83,6 @@ function analysis() {
   console.log(`Number of questions that reoccurred: ${Object.keys(min_occurences).length}`);
   console.log(`Avg. Recur Time: ${round(recur_times.reduce((partialSum, a) => partialSum + a, 0) / (recur_times.length * 60 * 60 * 1000 * 24))} Days`);
 
-
   console.log("\nDifficulty Count\n=======");
   for (let diff of Object.keys(diff_counts)) {
     console.log(`${diff.padEnd(7)}: ${diff_counts[diff]["count"]} (${round(100 * diff_counts[diff]["count"] / rows.length)}%)`);
@@ -109,6 +106,8 @@ function analysis() {
 
   // save recur times for histogram
   //fs.writeFileSync("recur.csv", recur_times.map((x) => x / (60 * 60 * 1000 * 24)).join(","), 'utf8');
+  // save acRate vs date
+  //fs.writeFileSync("acRate.csv", rates.map(row => row.join(",")).join("\n"), 'utf8');
 }
 
 function set_headers(row) {
