@@ -1,17 +1,29 @@
 const fs = require("fs");
 const { parse } = require("csv-parse");
 
-global.rows = [];
-global.index = {};
+const read_csv = (filename) => {
+  return new Promise((resolve, reject) => {
+    const index = {}; // Record<string, number>
+    const rows = [];
 
-fs.createReadStream("./daily.csv")
-  .pipe(parse({ delimiter: ",", to_line: 1 }))
-  .on("data", set_headers)
-  .on("end", () => fs.createReadStream("./daily.csv")
-    .pipe(parse({ delimiter: ",", from_line: 2 }))
-    .on("data", read_row)
-    .on("end", analysis)
-  );
+    let isHeaderRead = false;
+
+    const processStream = (row) => {
+      if (!isHeaderRead) {
+        row.forEach((col, i) => (index[col] = i));
+        isHeaderRead = true;
+      } else {
+        rows.push(row);
+      }
+    };
+
+    fs.createReadStream(filename)
+      .pipe(parse({ delimiter: "," }))
+      .on("data", processStream)
+      .on("end", () => resolve({ rows, index }))
+      .on("error", reject);
+  });
+};
 
 const compare = (a, b) => {
     if(a > b) return 1;
@@ -27,10 +39,9 @@ const round = (num) => {
   });
 }
 
-function analysis() {
+async function analysis(filename) {
   // headers: date, titleSlug, questionFrontendId, title, difficulty, acRate
-  let rows = global.rows;
-  let i = global.index;
+  const {rows, index: i} = await read_csv(filename);
 
   let counts = {};
   let rates = [["date", "acRate"]];
@@ -49,7 +60,7 @@ function analysis() {
   for (let row of rows) {
     let d = row[i["date"]].split('-');
     let date = Date.UTC(d[0], d[1] - 1, d[2]);
-    let slug = row[i["titleSlug"]];
+    // let slug = row[i["titleSlug"]];
     let id = row[i["questionFrontendId"]];
     let title = row[i["title"]];
     let difficulty = row[i["difficulty"]];
@@ -110,12 +121,4 @@ function analysis() {
   //fs.writeFileSync("acRate.csv", rates.map(row => row.join(",")).join("\n"), 'utf8');
 }
 
-function set_headers(row) {
-  for (let i in row) {
-    global.index[row[i]] = i;
-  }
-}
-
-function read_row(row) {
-  global.rows.push(row);
-}
+analysis("./daily.csv")
