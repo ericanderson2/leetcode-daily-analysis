@@ -2,7 +2,6 @@ const fs = require("fs");
 const { parse } = require("csv-parse");
 
 const read_csv = (filename) => {
-  console.log(filename)
   return new Promise((resolve, reject) => {
     const index = {}; // Record<string, number>
     const rows = [];
